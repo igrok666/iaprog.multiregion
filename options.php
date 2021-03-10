@@ -4,7 +4,7 @@ $MODULE_STR = "iaprog_multiregion";
 require_once $_SERVER['DOCUMENT_ROOT'] . '/local/modules/' . $MODULE_ID . '/lib/ItexPrice.php';
 
 use ItexPrice\Main;
-
+/*test*/
 $arProfile = Main::GetProfile();
 if ($_GET['save'] == 'Y' && !empty($_POST['profile_id']) && $_POST['Apply'] == 'Сохранить') {
     unset($_POST['Apply']);
