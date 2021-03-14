@@ -1,6 +1,9 @@
 <? defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
 
-Class iaprog_multiregion extends CModule
+use \Bitrix\Main\EventManager;
+use \iaprogMultiregion\iaprogmultiregion;
+
+class iaprog_multiregion extends CModule
 {
 
     var $MODULE_ID = "iaprog.multiregion";
@@ -25,7 +28,7 @@ Class iaprog_multiregion extends CModule
         }
 
         $this->MODULE_NAME = "Модуль мультирегиональности";
-        $this->MODULE_DESCRIPTION = "После установки у вас появится возможность задавать настройки для конкретного региона";
+        $this->MODULE_DESCRIPTION = "После установки у вас появится возможность задавать настройки для конкретного домена";
         $this->PARTNER_NAME = "Александров Илья";
         $this->PARTNER_URI = "https:\\1c-dev.ru";
     }
@@ -52,11 +55,40 @@ Class iaprog_multiregion extends CModule
         return true;
     }
 
+    function InstallEvents()
+    {
+        EventManager::getInstance()->registerEventHandler('main', "OnEndBufferContent", $this->MODULE_ID, "iaprog_multiregion", "OnEndBufferContentHandler");
+//        RegisterModuleDependences("main", "OnEndBufferContent", $this->MODULE_ID, "iaprogmultiregion", "OnEndBufferContentHandler");
+    }
+
+    function UnInstallEvents()
+    {
+        EventManager::getInstance()->unRegisterEventHandler('main', "OnEndBufferContent", $this->MODULE_ID, "iaprog_multiregion", "OnEndBufferContentHandler");
+//        UnRegisterModuleDependences("main", "OnEndBufferContent", $this->MODULE_ID, "iaprogmultiregion", "OnEndBufferContentHandler");
+    }
+
+    public static function OnEndBufferContentHandler(&$content)
+    {
+        if (stripos($_SERVER['REQUEST_URI'], '/bitrix/admin') === false) {
+            $arProfile = iaprogmultiregion::GetProfile();
+
+            foreach ($arProfile as $oneProfile) {
+                if ($oneProfile['NAME'] == $_SERVER['HTTP_HOST']) {
+                    $arProfileSettings = iaprogmultiregion::GetProfileSettings($oneProfile["ID"]);
+                }
+            }
+            foreach ($arProfileSettings['REGION_TAG']['VALUE'] as $key => $TAG) {
+                $content = str_replace($TAG, $arProfileSettings['REGION_TAG_VALUE']['VALUE'][$key], $content);
+            }
+        }
+    }
+
     function DoInstall()
     {
         global $DOCUMENT_ROOT, $APPLICATION;
         $this->InstallFiles();
         $this->InstallDB();
+        $this->InstallEvents();
         RegisterModule($this->MODULE_ID);
         $APPLICATION->IncludeAdminFile("Установка модуля " . $this->MODULE_ID, $DOCUMENT_ROOT . "/local/modules/" . $this->MODULE_ID . "/install/step.php");
     }
@@ -66,6 +98,7 @@ Class iaprog_multiregion extends CModule
         global $DOCUMENT_ROOT, $APPLICATION;
         $this->UnInstallFiles();
         $this->UnInstallDB();
+        $this->UnInstallEvents();
         UnRegisterModule($this->MODULE_ID);
         $APPLICATION->IncludeAdminFile("Деинсталляция модуля " . $this->MODULE_ID, $DOCUMENT_ROOT . "/local/modules/" . $this->MODULE_ID . "/install/unstep.php");
     }

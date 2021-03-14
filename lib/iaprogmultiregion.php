@@ -1,6 +1,6 @@
 <?
 
-namespace ItexPrice;
+namespace iaprogMultiregion;
 
 $MODULE_ID = "iaprog.multiregion";
 require_once $_SERVER['DOCUMENT_ROOT'] . '/local/modules/' . $MODULE_ID . '/install/index.php';
@@ -20,13 +20,15 @@ if (\Bitrix\Main\Loader::includeModule('catalog')) {
 Loader::includeModule('catalog');
 Loader::includeModule('iblock');
 
-class Main
+class iaprogmultiregion
 {
-    public function RemoveProfile($ID){
+    public function RemoveProfile($ID)
+    {
         OrmTable::delete($ID);
     }
 
-    public function RemoveSettings($ID){
+    public function RemoveSettings($ID)
+    {
         SettingsTable::delete($ID);
     }
 
@@ -62,7 +64,7 @@ class Main
         $ID_PROFILE = $arFields['profile_id'];
         unset($arFields['profile_id']);
         unset($arFields['NAME']);
-        $ob = new Main();
+        $ob = new iaprogmultiregion();
         $oldProperty = $ob->GetProfileSettings($ID_PROFILE);
         foreach ($oldProperty as $key => $oneField) {
             $ID = $oneField['ID'];

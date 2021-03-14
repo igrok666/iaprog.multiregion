@@ -1,4 +1,4 @@
 <?if(!check_bitrix_sessid()) return;?>
 <?
-echo CAdminMessage::ShowNote("Модуль Создания прайс листа (itex.price.list) успешно установлен");
+echo CAdminMessage::ShowNote("Модуль мультирегиональности (iaprog.multiregion) успешно установлен");
 ?>
