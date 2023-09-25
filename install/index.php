@@ -14,7 +14,7 @@ class iaprog_multiregion extends CModule
     var $MODULE_DESCRIPTION;
     var $MODULE_CSS;
 
-    function iaprog_multiregion()
+    function __construct()
     {
         $arModuleVersion = array();
 
